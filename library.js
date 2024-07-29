@@ -70,20 +70,7 @@ class User {
   }
 }
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-const library = new Library();
-const user = new User("Alice");
-
-// Add some initial books to the library
-library.addBook("The Great Gatsby", 3);
-library.addBook("1984", 2);
-library.addBook("To Kill a Mockingbird", 1);
-
-function showMenu() {
+function showMenu(rl, library, user) {
   console.log(
     "\n ************************************************************"
   );
@@ -93,22 +80,24 @@ function showMenu() {
   console.log("3. Return a book");
   console.log("4. View my borrowed books");
   console.log("5. Exit");
-  rl.question("Choose an option: ", handleMenu);
+  rl.question("Choose an option: ", (option) =>
+    handleMenu(option, rl, library, user)
+  );
   console.log("\n ");
 }
 
-function handleMenu(option) {
+function handleMenu(option, rl, library, user) {
   switch (option) {
     case "1":
       library.viewBooks();
-      showMenu();
+      showMenu(rl, library, user);
       break;
     case "2":
       rl.question(
         "Enter the title of the book you want to borrow: ",
         (title) => {
           library.borrowBook(user, title);
-          showMenu();
+          showMenu(rl, library, user);
         }
       );
       break;
@@ -117,22 +106,39 @@ function handleMenu(option) {
         "Enter the title of the book you want to return: ",
         (title) => {
           library.returnBook(user, title);
-          showMenu();
+          showMenu(rl, library, user);
         }
       );
       break;
     case "4":
       user.viewBorrowedBooks();
-      showMenu();
+      showMenu(rl, library, user);
       break;
     case "5":
       rl.close();
       break;
     default:
       console.log("Invalid option. Please choose again.");
-      showMenu();
+      showMenu(rl, library, user);
       break;
   }
 }
 
-showMenu();
+if (require.main === module) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  const library = new Library();
+  const user = new User("Alice");
+
+  // Add some initial books to the library
+  library.addBook("The Great Gatsby", 3);
+  library.addBook("1984", 2);
+  library.addBook("To Kill a Mockingbird", 1);
+
+  showMenu(rl, library, user);
+}
+
+module.exports = { Library, User, showMenu, handleMenu };
