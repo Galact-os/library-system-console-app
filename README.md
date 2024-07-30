@@ -1,7 +1,6 @@
 # library-system-console-app
 
-How To Run
-Execute command `node library.js` in the root directory of the project.
+Execute command `node library.js` in the root directory of the project to run the app.
 
 Design Decisions
 
