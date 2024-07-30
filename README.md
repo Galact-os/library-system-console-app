@@ -19,7 +19,7 @@ Several assumptions were made while developing this application:
     1.	Each book is uniquely identified by its title, with no duplicate titles.
     2.	Users have a borrowing limit of two books at any given time to ensure fair use of library resources.
     3.	Only one copy of a book can be borrowed by a user at any time, preventing duplicate entries in the user’s borrowed list.
-    4.	The application assumes a console environment for user interaction, with potential future plans for a graphical or web-based interface.
+    4.	The application assumes a console environment for user interaction.
 
 Tests
 
