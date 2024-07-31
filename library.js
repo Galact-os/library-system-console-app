@@ -1,16 +1,30 @@
 const readline = require("readline");
 
+class Book {
+  constructor(name, copies, author) {
+    this.bookName = name;
+    this.copies = copies;
+    this.author = author;
+  }
+}
+
 class Library {
   constructor() {
     this.books = {};
   }
 
-  addBook(title, copies = 1) {
-    if (this.books[title]) {
-      this.books[title] += copies;
-    } else {
-      this.books[title] = copies;
-    }
+  addBook(title, copies = 1, author = undefined) {
+    let newBook = new Book(title, copies, author);
+
+    let uniqueId = Object.entries(this.books).length + 1;
+
+    this.books[uniqueId] = {
+      bookName: newBook.bookName,
+      copies: newBook.copies,
+      author: newBook.author,
+    };
+
+    console.log(this.books);
   }
 
   viewBooks() {
@@ -18,27 +32,32 @@ class Library {
       console.log("The library is empty.");
     } else {
       console.log("Books in the library:");
-      for (let [title, copies] of Object.entries(this.books)) {
-        console.log(`${title}: ${copies} copies`);
-      }
+      console.log(Object.entries(this.books));
+      Object.entries(this.books).forEach(([uniqueId, bookObj], indx) => {
+        console.log(
+          `Id:${uniqueId} ----- ${bookObj.bookName}, ${bookObj.copies} copies, ${bookObj.author} Author`
+        );
+      });
     }
   }
 
-  borrowBook(user, title) {
+  borrowBook(user, bookId) {
     if (user.borrowedBooks.length >= 2) {
       console.log("You have reached your borrowing limit of 2 books.");
       return;
     }
 
-    if (this.books[title] && this.books[title] > 0) {
-      this.books[title] -= 1;
-      user.borrowedBooks.push(title);
-      console.log(`You have borrowed "${title}".`);
-      if (this.books[title] === 0) {
-        delete this.books[title];
+    if (this.books[bookId] && this.books[bookId].copies > 0) {
+      this.books[bookId].copies -= 1;
+      user.addBookToUserCollection(bookId, this.books[bookId]);
+      console.log(`You have borrowed "${this.books[bookId].bookName}".`);
+      if (this.books[bookId].copies === 0) {
+        delete this.books[bookId];
       }
     } else {
-      console.log(`"${title}" is not available in the library.`);
+      console.log(
+        `"${this.books[bookId].bookName}" is not available in the library.`
+      );
     }
   }
 
@@ -65,8 +84,18 @@ class User {
       console.log("You have no borrowed books.");
     } else {
       console.log("Your borrowed books:");
-      this.borrowedBooks.forEach((book) => console.log(book));
+      this.borrowedBooks.forEach((book) =>
+        console.log(`${book.bookUnuqieId}: ${book.description}`)
+      );
     }
+  }
+
+  addBookToUserCollection(bookUnuqieId, bookObj) {
+    this.borrowedBooks.push({
+      bookUnuqieId,
+      description: `${bookObj.bookName}, ${bookObj.author}`,
+    });
+    console.log("boorowedBook", this.borrowedBooks);
   }
 }
 
@@ -95,8 +124,8 @@ function handleMenu(option, rl, library, user) {
     case "2":
       rl.question(
         "Enter the title of the book you want to borrow: ",
-        (title) => {
-          library.borrowBook(user, title);
+        (bookId) => {
+          library.borrowBook(user, bookId);
           showMenu(rl, library, user);
         }
       );
@@ -134,9 +163,10 @@ if (require.main === module) {
   const user = new User("Alice");
 
   // Add some initial books to the library
-  library.addBook("The Great Gatsby", 3);
-  library.addBook("1984", 2);
-  library.addBook("To Kill a Mockingbird", 1);
+  library.addBook("The Great Gatsby", 3, "chetan bhagat");
+  library.addBook("1984", 2, "john maccallen");
+  library.addBook("To Kill a Mockingbird", 1, "simon feck");
+  library.addBook("1984", 2, "timon meccarthy");
 
   showMenu(rl, library, user);
 }
